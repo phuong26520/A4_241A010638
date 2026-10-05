@@ -15,6 +15,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
  
 import java.util.Locale;
+import java.util.ArrayList;
  
 public class MainActivity extends AppCompatActivity {
  
@@ -23,6 +24,9 @@ public class MainActivity extends AppCompatActivity {
  
     private EditText edtSoA, edtSoB, edtCanNang, edtChieuCao;
     private TextView tvKetQua, tvBmi, tvPhanLoai;
+    // NC2: lưu tối đa 5 phép tính, khôi phục khi xoay màn hình.
+    private ArrayList<String> lichSu = new ArrayList<>();
+    private TextView tvLichSu;
  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
         edtChieuCao = findViewById(R.id.edtChieuCao);
         tvBmi = findViewById(R.id.tvBmi);
         tvPhanLoai = findViewById(R.id.tvPhanLoai);
+        tvLichSu = findViewById(R.id.tvLichSu);
+        if (savedInstanceState != null) {
+            ArrayList<String> daLuu = savedInstanceState.getStringArrayList("lichSu");
+            if (daLuu != null) lichSu = daLuu;
+        }
+        hienThiLichSu();
  
         Button btnCong = findViewById(R.id.btnCong);
         Button btnTru = findViewById(R.id.btnTru);
@@ -117,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
  
         tvKetQua.setText(String.format(Locale.getDefault(), "%.2f %c %.2f = %.2f",
                 a, phepToan, b, ketQua));
+        luuLichSu(tvKetQua.getText().toString());
         Log.d(TAG, "Phép tính: " + a + " " + phepToan + " " + b + " = " + ketQua);
     }
  
@@ -161,4 +172,21 @@ public class MainActivity extends AppCompatActivity {
         if (bmi < 25) return getString(R.string.bmi_over);
         return getString(R.string.bmi_obese);
     }
+    // NC2: hiển thị phép tính mới nhất trước, giới hạn 5 dòng.
+    private void luuLichSu(String phepTinh) {
+        lichSu.add(0, phepTinh);
+        if (lichSu.size() > 5) lichSu.remove(lichSu.size() - 1);
+        hienThiLichSu();
+    }
+
+    private void hienThiLichSu() {
+        tvLichSu.setText(android.text.TextUtils.join("\n", lichSu));
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putStringArrayList("lichSu", lichSu);
+    }
 }
+
