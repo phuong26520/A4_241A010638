@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
  
 import java.util.Locale;
 import java.util.ArrayList;
+import androidx.core.content.ContextCompat;
  
 public class MainActivity extends AppCompatActivity {
  
@@ -159,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
             double bmi = canNang / (chieuCao * chieuCao);
             tvBmi.setText(String.format(Locale.getDefault(), "BMI = %.1f", bmi));
             tvPhanLoai.setText(phanLoai(bmi));
+            doiMauBmi(bmi);
         } catch (NumberFormatException e) {
             Log.e(TAG, "Lỗi nhập liệu BMI", e);
             Toast.makeText(this, R.string.err_not_number, Toast.LENGTH_SHORT).show();
@@ -188,5 +190,19 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putStringArrayList("lichSu", lichSu);
     }
-}
 
+    // NC3: xanh khi bình thường, vàng khi thừa cân, đỏ khi béo phì.
+    private void doiMauBmi(double bmi) {
+        int mau;
+        if (bmi < 18.5) {
+            mau = R.color.black;
+        } else if (bmi < 23) {
+            mau = R.color.bmi_normal;
+        } else if (bmi < 25) {
+            mau = R.color.bmi_over;
+        } else {
+            mau = R.color.bmi_obese;
+        }
+        tvPhanLoai.setTextColor(ContextCompat.getColor(this, mau));
+    }
+}
